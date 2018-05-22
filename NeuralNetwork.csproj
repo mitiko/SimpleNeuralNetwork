@@ -4,14 +4,15 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <PackageId>SimpleNeuralNetwork</PackageId>
     <Description>The simplest neural network library written in .NET Standard 2.0</Description>
-    <Version>1.2.0</Version>
+    <Version>1.2.1</Version>
     <Authors>Dimitar Rusev</Authors>
     <Copyright>Copyright (c) 2018 Dimitar Rusev</Copyright>
     <PackageIconUrl>https://cdn3.iconfinder.com/data/icons/various-networks/64/backpropagation_neural_network-64.png</PackageIconUrl>
     <PackageTags>neural network;ai;simple;</PackageTags>
     <Title>Simple Neural Network</Title>
     <Company>125su</Company>
-    <PackageReleaseNotes>Fixed a big in the math and added option to change activation function of the input layer</PackageReleaseNotes>
+    <PackageReleaseNotes>Fixed a bug in the math and added option to change activation function of the input layer</PackageReleaseNotes>
+    <RepositoryUrl>https://github.com/Mitiko/SimpleNeuralNetwork</RepositoryUrl>
   </PropertyGroup>
 
 </Project>

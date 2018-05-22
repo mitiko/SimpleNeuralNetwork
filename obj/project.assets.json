@@ -181,7 +181,7 @@
     "/usr/share/dotnet/sdk/NuGetFallbackFolder": {}
   },
   "project": {
-    "version": "1.2.0",
+    "version": "1.2.1",
     "restore": {
       "projectUniqueName": "/home/mitiko/Documents/Projects/NeuralNetwork/NeuralNetwork.csproj",
       "projectName": "SimpleNeuralNetwork",

@@ -2,14 +2,14 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
   <metadata>
     <id>SimpleNeuralNetwork</id>
-    <version>1.2.0</version>
+    <version>1.2.1</version>
     <title>Simple Neural Network</title>
     <authors>Dimitar Rusev</authors>
     <owners>Dimitar Rusev</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <iconUrl>https://cdn3.iconfinder.com/data/icons/various-networks/64/backpropagation_neural_network-64.png</iconUrl>
     <description>The simplest neural network library written in .NET Standard 2.0</description>
-    <releaseNotes>Fixed a big in the math and added option to change activation function of the input layer</releaseNotes>
+    <releaseNotes>Fixed a bug in the math and added option to change activation function of the input layer</releaseNotes>
     <copyright>Copyright (c) 2018 Dimitar Rusev</copyright>
     <tags>neural network ai simple</tags>
     <repository url="https://github.com/Mitiko/SimpleNeuralNetwork" />
