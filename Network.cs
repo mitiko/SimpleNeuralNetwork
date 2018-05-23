@@ -132,7 +132,7 @@ namespace NeuralNetwork
                 for (int i = 0; i < ln - 1; i++)
                 {
                     // We have -1 because the expected data does not cover the unused bias
-                    l.Neurons[i].Error = expected[i] - l.Neurons[i].Output;
+                    l.Neurons[i].Error = l.Neurons[i].Output - expected[i];
                 }
             }
 
@@ -163,7 +163,7 @@ namespace NeuralNetwork
                 {
                     // The delta in weight between neurons i and j in layers l-1 and l
                     // is output at i *times* error at j *times* alpha (learning rate)
-                    double deltaWeight = p.Neurons[i].Output * l.Neurons[j].Error * this.Alpha;
+                    double deltaWeight = p.Neurons[i].Output * l.Neurons[j].Error * l.Neurons[j].DeActivate() * this.Alpha;
                     // Now change weight
                     p.Weights[i][j] += deltaWeight;
                 }
