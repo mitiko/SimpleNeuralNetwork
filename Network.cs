@@ -132,7 +132,7 @@ namespace NeuralNetwork
                 for (int i = 0; i < ln - 1; i++)
                 {
                     // We have -1 because the expected data does not cover the unused bias
-                    l.Neurons[i].Error = l.Neurons[i].Output - expected[i];
+                    l.Neurons[i].Error = expected[i] - l.Neurons[i].Output;
                 }
             }
 
