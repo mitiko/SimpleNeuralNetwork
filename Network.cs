@@ -212,7 +212,7 @@ namespace NeuralNetwork
                         // Check for NaN
                         if (result.ToList().Contains(double.NaN))
                         {
-                            Console.WriteLine($"Fuck {i}");
+                            Console.WriteLine($"Error: This results are now NaN. Epoch: {i}. Wait till next version for fix.");
                             return;
                         }
                         // Backporpagate, beginning with the last layer
@@ -230,7 +230,7 @@ namespace NeuralNetwork
                         // Check for NaN
                         if (result.ToList().Contains(double.NaN))
                         {
-                            Console.WriteLine($"Fuck {i}");
+                            Console.WriteLine($"Error: This results are now NaN. Epoch: {i}. Wait till next version for fix.");
                             return;
                         }
                         // Backporpagate, beginning with the last layer
