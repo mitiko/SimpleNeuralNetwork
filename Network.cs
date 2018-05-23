@@ -28,7 +28,7 @@ namespace NeuralNetwork
             else if(activationFunctions.Length == 1)
             {
                 var af = activationFunctions[0];
-                var temp = new string[layers.Length - 1];
+                var temp = new string[layers.Length];
                 for (int k = 0; k < temp.Length; k++)
                 {
                     temp[k] = activationFunctions[0];
