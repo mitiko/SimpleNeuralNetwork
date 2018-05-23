@@ -310,7 +310,7 @@ namespace NeuralNetwork
             var learningRate = this.Alpha.ToString();
             var layers = Layers.Select(l => (l.Neurons.Length - 1).ToString()).ToArray();
             var names = Layers.Select(l => l.Name).ToArray();
-            var hlaf = Layers.Skip(1).Select(l => l.Neurons[0].ActivationFunction).ToArray();
+            var hlaf = Layers.Select(l => l.Neurons[0].ActivationFunction).ToArray();
             var text = new string[3 + Layers.Count];
 
             text[0] = learningRate;
