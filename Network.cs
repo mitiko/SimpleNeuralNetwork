@@ -41,22 +41,34 @@ namespace NeuralNetwork
                 " Try matching the numbers, or leaving only one activation function for all hidden layers");
             }
             
-            this.Layers.Add(new InputLayer(new LayerConfiguration(names[0], names[1], layers[0], layers[1], activationFunctions[0])));
+            var input = new InputLayer(names[0], layers[0], activationFunctions[0]);
+            this.Layers.Add(input);
             int i;
             for (i = 1; i < layers.Length - 1; i++)
             {
-                this.Layers.Add(new HiddenLayer(new LayerConfiguration(names[i], names[i + 1], layers[i], layers[i + 1], activationFunctions[i])));
+                var hidden = new HiddenLayer(names[i], layers[i], activationFunctions[i]);
+                this.Layers.Add(hidden);
             }
-            this.Layers.Add(new OutputLayer(new LayerConfiguration(names[i], "", layers[i], -1, activationFunctions[i])));
+            var output = new OutputLayer(names[i], layers[i], activationFunctions[i]);
+            this.Layers.Add(output);
 
-            this.Layers.ForEach(layer => layer.Network = this);
+            for (i = 0; i < this.Layers.Count; i++)
+            {
+                try
+                {
+                    this.Layers[i].PreviousLayer = this.Layers[i - 1];
+                    this.Layers[i].NextLayer = this.Layers[i + 1];
+                    this.Layers[i].Network = this;
+                }
+                catch (Exception) { }
+            }
         }
         #endregion
 
         #region Methods
         public static bool IsLayerLast(Layer layer)
         {
-            return layer.LayerConfiguration?.NextLayerNeuronCount == -1;
+            return layer.NextLayer == null;
         }
         
         public static Layer GetLayerByName(string layerName, Network Network)
@@ -67,16 +79,6 @@ namespace NeuralNetwork
         public static int GetIndexOfLayer(Layer layer)
         {
             return layer.Network.Layers.IndexOf(layer);
-        }
-
-        public static Layer GetPreviousLayer(Layer layer)
-        {
-            if(GetIndexOfLayer(layer) == 0)
-            {
-                return null;
-            }
-
-            return layer.Network.Layers[GetIndexOfLayer(layer) - 1];
         }
 
         public static void UpdateLayer(Layer layer)
@@ -112,10 +114,10 @@ namespace NeuralNetwork
             // This is a recursive function
             // l is the current working layer
             // p is previous layer in net (next working layer)
-            var p = GetPreviousLayer(l);
+            var p = l.PreviousLayer;
             if(p == null)
             {
-                // GetPreviousLayerByName returns null only when there is no previous layer
+                // PreviousLayer is null only when there is no previous layer
                 // Then we are all done!
                 // This means we can simply return
                 return;

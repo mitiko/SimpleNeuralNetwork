@@ -2,9 +2,9 @@ namespace NeuralNetwork
 {
     public class InputLayer : Layer
     {
-        public InputLayer(LayerConfiguration lc)
+        public InputLayer(string name, int neuronCount, string activationFunction, Layer nextLayer = null, Layer previousLayer = null)
         {
-            Configure(lc, false);
+            Configure(name, neuronCount, activationFunction, nextLayer, previousLayer, false);
         }
 
         public override double[] Output()
@@ -14,17 +14,14 @@ namespace NeuralNetwork
 
         public override void Forward()
         {
-            var nextLayer = Network.GetLayerByName(this.NextLayerName, this.Network);
             var output = Output();
 
-            for (int j = 0; j < nextLayer.Neurons.Length - 1; j++)
+            for (int j = 0; j < this.NextLayer.Neurons.Length - 1; j++)
             {
                 // We have -1 because last neuron of every layer is bias
                 // Set next layer's neurons input to be this layer's output
-                nextLayer.Neurons[j].Input = output[j];
+                this.NextLayer.Neurons[j].Input = output[j];
             }
-
-            Network.UpdateLayer(nextLayer);
         }
     }
 }
