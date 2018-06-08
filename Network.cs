@@ -86,23 +86,20 @@ namespace NeuralNetwork
             layer.Network.Layers[GetIndexOfLayer(layer)] = layer;
         }
 
-        public static double[] Multiply(Neuron[] neurons, double[][] weights)
+        public static double[] Multiply(Neurons neurons, double[][] weights)
         {
             // Activate neurons
             // Each neuron output * weight to each neuron in next layer
             // For loop in next layer and for loop in those neurons
             var result = new double[weights[0].Length];
         
-            for (int i = 0; i < neurons.Length; i++)
-            {
-                neurons[i].Activate();
-            }
+            neurons.Activate();
 
             for (int j = 0; j < result.Length; j++)
             {
                 for (int i = 0; i < neurons.Length; i++)
                 {
-                    result[j] += neurons[i].Output * weights[i][j];
+                    result[j] += neurons.Output[i] * weights[i][j];
                 }
             }
 
@@ -134,7 +131,7 @@ namespace NeuralNetwork
                 for (int i = 0; i < ln - 1; i++)
                 {
                     // We have -1 because the expected data does not cover the unused bias
-                    l.Neurons[i].Error = expected[i] - l.Neurons[i].Output;
+                    l.Neurons.Error[i] = expected[i] - l.Neurons.Output[i];
                 }
             }
 
@@ -151,10 +148,10 @@ namespace NeuralNetwork
                 // for the error of the previous layer
                 for (int j = 0; j < ln - 1; j++)
                 {
-                    sum += l.Neurons[j].Error * p.Weights[i][j] * l.Neurons[j].DeActivate();
+                    sum += l.Neurons.Error[j] * p.Weights[i][j] * l.Neurons.DeActivate()[j];
                 }
                 
-                p.Neurons[i].Error = sum;
+                p.Neurons.Error[i] = sum;
             }
 
 
@@ -165,7 +162,7 @@ namespace NeuralNetwork
                 {
                     // The delta in weight between neurons i and j in layers l-1 and l
                     // is output at i *times* error at j *times* alpha (learning rate)
-                    double deltaWeight = p.Neurons[i].Output * l.Neurons[j].Error * l.Neurons[j].DeActivate() * this.Alpha;
+                    double deltaWeight = p.Neurons.Output[i] * l.Neurons.Error[j] * l.Neurons.DeActivate()[j] * this.Alpha;
                     // Now change weight
                     p.Weights[i][j] += deltaWeight;
                 }
@@ -179,7 +176,8 @@ namespace NeuralNetwork
             // Give input to first layer
             for (int i = 0; i < Layers[0].Neurons.Length - 1; i++)
             {
-                Layers[0].Neurons[i].Input = input[i];
+                Layers[0].Neurons.Input[i] = input[i];
+                // TODO: Try directly assigning arrays -> unstable build
             }
 
             var result = new double[this.Layers[this.Layers.Count - 1].Neurons.Length];
@@ -312,7 +310,7 @@ namespace NeuralNetwork
             var learningRate = this.Alpha.ToString();
             var layers = Layers.Select(l => (l.Neurons.Length - 1).ToString()).ToArray();
             var names = Layers.Select(l => l.Name).ToArray();
-            var hlaf = Layers.Select(l => l.Neurons[0].ActivationFunction).ToArray();
+            var hlaf = Layers.Select(l => l.Neurons.ActivationFunction).ToArray();
             var text = new string[3 + Layers.Count];
 
             text[0] = learningRate;

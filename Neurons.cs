@@ -2,76 +2,117 @@ using System;
 
 namespace NeuralNetwork
 {
-    public class Neuron
+    public class Neurons
     {
         #region Properties
-        public double Input { get; internal set; }
-        public double Output { get; private set; }
-        public double Error { get; set; }
+        public double[] Input { get; protected internal set; }
+        public double[] Output { get; private set; }
+        public double[] Error { get; private set; }
         public string ActivationFunction { get; set; }
+        public int Length { get; private set; }
         #endregion
 
         #region Methods
-        public void Activate()
+        public Neurons(int numberOfNeurons, string activationFunction)
         {
-            switch (this.ActivationFunction)
+            this.ActivationFunction = activationFunction;
+            this.Length = numberOfNeurons;
+
+            for (int i = 0; i < this.Length; i++)
             {
-                case "linear":
-                    this.Output = this.Input;
-                    break;
-                case "logistic":
-                case "sigmoid":
-                    this.Output = Sigmoid(this.Input);
-                    break;
-                case "tanh":
-                    this.Output = HyperbolicTangent(this.Input);
-                    break;
-                case "logisticprime":
-                case "sigmoidprime":
-                    this.Output = SigmoidPrime(this.Input);
-                    break;
-                case "easteregg":
-                case "bob":
-                    this.Output = Bob(this.Input);
-                    break;
-                default:
-                    Console.WriteLine("Activation function  not supported, using 2 * sigmoid(1.45x) - 1");
-                    this.Output = Bob(this.Input);
-                    break;
+                this.Input[i] = 0;
+                this.Output[i] = 0;
             }
+
+            // Bias input is always 1
+            this.Input[this.Length - 1] = 1;
         }
 
-        public double DeActivate()
+        public Func<double, double> Activation()
         {
-            // Get the derivateive of the activation function
-            // use this.Output as input
-            double result = 1.0d;
+            Func<double, double> result = null;
             switch (this.ActivationFunction)
             {
                 case "linear":
+                    result = new Func<double, double>(x => x);
                     break;
                 case "logistic":
                 case "sigmoid":
-                    result = DeSigmoid(this.Output);
+                    result = Sigmoid;
                     break;
                 case "tanh":
-                    result = DeHyperbolicTangent(this.Output);
+                    result = HyperbolicTangent;
                     break;
                 case "logisticprime":
                 case "sigmoidprime":
-                    result = DeSigmoidPrime(this.Output);
+                    result = SigmoidPrime;
                     break;
                 case "easteregg":
                 case "bob":
-                    result = DeBob(this.Output);
+                    result = Bob;
                     break;
                 default:
-                    Console.WriteLine("Activation function  not supported, using 2 * sigmoid(1.45x) - 1");
-                    result = DeBob(this.Output);
+                    Console.WriteLine("Activation function not supported, using default: sigmoid");
+                    result = Sigmoid;
                     break;
             }
 
             return result;
+        }
+
+        public Func<double, double> DeActivatation()
+        {
+            // Get the derivateive of the activation function
+            // use this.Output as input
+            Func<double, double> result = null;
+            switch (this.ActivationFunction)
+            {
+                case "linear":
+                    break;
+                case "logistic":
+                case "sigmoid":
+                    result = DeSigmoid;
+                    break;
+                case "tanh":
+                    result = DeHyperbolicTangent;
+                    break;
+                case "logisticprime":
+                case "sigmoidprime":
+                    result = DeSigmoidPrime;
+                    break;
+                case "easteregg":
+                case "bob":
+                    result = DeBob;
+                    break;
+                default:
+                    Console.WriteLine("Activation function  not supported, using default: sigmoid");
+                    result = DeSigmoid;
+                    break;
+            }
+
+            return result;
+        }
+
+        public void Activate()
+        {
+        }
+
+        public double[] DeActivate()
+        {
+            return default(double[]);
+        }
+
+        public double this[int index]
+        {
+            get
+            {
+                return Output[index];
+            }
+
+            set
+            {
+                Input[index] = value;
+            }
         }
         #endregion
 

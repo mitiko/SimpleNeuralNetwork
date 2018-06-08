@@ -10,7 +10,7 @@ namespace NeuralNetwork
         public string ActivationFunction { get; set; }
         public Layer NextLayer { get; protected internal set; }
         public Layer PreviousLayer { get; protected internal set; }
-        public Neuron[] Neurons { get; protected set; }
+        public Neurons Neurons { get; protected set; }
         public double[][] Weights { get; protected set; }
         public Network Network { get; set; }
         #endregion
@@ -20,18 +20,13 @@ namespace NeuralNetwork
         {
             this.Name = name;
             this.NeuronCount = neuronCount;
-            this.Neurons = new Neuron[this.NeuronCount + 1]; // +1 for bias(es)
+            this.Neurons = new Neurons(this.NeuronCount + 1, activationFunction); // +1 for bias(es)
             this.NextLayer = nextLayer;
             this.PreviousLayer = previousLayer;
-            // Generate Neurons and their activation functions
-            for (int z = 0; z < this.Neurons.Length; z++)
-            {
-                this.Neurons[z] = new Neuron() { ActivationFunction = activationFunction };
-            }
+            
             // Although the last layer has a bias, it is left unused
             if(!isLayerLast)
             {
-                this.Neurons[this.Neurons.Length - 1].Input = 1.0d; // Set bias
                 // We are now sure there exists next layer
                 this.Weights = new double[this.Neurons.Length][];
                 // Generate weights (randomly)
