@@ -17,6 +17,8 @@ namespace NeuralNetwork
         {
             this.ActivationFunction = activationFunction;
             this.Length = numberOfNeurons;
+            this.Input = new double[this.Length];
+            this.Output = new double[this.Length];
 
             for (int i = 0; i < this.Length; i++)
             {
@@ -95,11 +97,25 @@ namespace NeuralNetwork
 
         public void Activate()
         {
+            var af = Activation();
+
+            for (int i = 0; i < this.Length; i++)
+            {
+                this.Output[i] = af.Invoke(this.Input[i]);
+            }
         }
 
         public double[] DeActivate()
         {
-            return default(double[]);
+            var df = DeActivatation();
+            double[] result = new double[this.Length];
+
+            for (int i = 0; i < this.Length; i++)
+            {
+                result[i] = df.Invoke(this.Input[i]);
+            }
+
+            return result;
         }
 
         public double this[int index]

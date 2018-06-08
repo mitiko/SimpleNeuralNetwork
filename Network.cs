@@ -56,11 +56,16 @@ namespace NeuralNetwork
             {
                 try
                 {
-                    this.Layers[i].PreviousLayer = this.Layers[i - 1];
-                    this.Layers[i].NextLayer = this.Layers[i + 1];
                     this.Layers[i].Network = this;
+                    this.Layers[i].PreviousLayer = this.Layers[i - 1];
                 }
-                catch (Exception) { }
+                catch (System.ArgumentOutOfRangeException) { }
+
+                try
+                {
+                    this.Layers[i].NextLayer = this.Layers[i + 1];
+                }
+                catch (System.ArgumentOutOfRangeException) { }
             }
         }
         #endregion
