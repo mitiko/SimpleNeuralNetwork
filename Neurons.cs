@@ -117,19 +117,6 @@ namespace NeuralNetwork
 
             return result;
         }
-
-        public double this[int index]
-        {
-            get
-            {
-                return Output[index];
-            }
-
-            set
-            {
-                Input[index] = value;
-            }
-        }
         #endregion
 
         #region Activation Functions
