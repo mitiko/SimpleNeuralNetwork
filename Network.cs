@@ -66,6 +66,8 @@ namespace NeuralNetwork
                     this.Layers[i].NextLayer = this.Layers[i + 1];
                 }
                 catch (System.ArgumentOutOfRangeException) { }
+                
+                this.Layers[i].Configure(i == this.Layers.Count - 1);
             }
         }
         #endregion

@@ -19,11 +19,13 @@ namespace NeuralNetwork
             this.Length = numberOfNeurons;
             this.Input = new double[this.Length];
             this.Output = new double[this.Length];
+            this.Error = new double[this.Length];
 
             for (int i = 0; i < this.Length; i++)
             {
                 this.Input[i] = 0;
                 this.Output[i] = 0;
+                this.Error[i] = 0;
             }
 
             // Bias input is always 1
@@ -134,7 +136,7 @@ namespace NeuralNetwork
 
         public static double SigmoidPrime(double value)
         {
-            return Sigmoid(value) * 2 -1;
+            return Sigmoid(value) * 2 - 1;
         }
 
         public static double DeSigmoidPrime(double value)

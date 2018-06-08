@@ -2,10 +2,8 @@ namespace NeuralNetwork
 {
     public class HiddenLayer : Layer
     {
-        public HiddenLayer(string name, int neuronCount, string activationFunction, Layer nextLayer = null, Layer previousLayer = null)
-        {
-            Configure(name, neuronCount, activationFunction, nextLayer, previousLayer, false);
-        }
+        public HiddenLayer(string name, int neuronCount, string activationFunction, Layer nextLayer = null, Layer previousLayer = null) : 
+        base(name, neuronCount, activationFunction, nextLayer, previousLayer) { }
 
         public override double[] Output()
         {

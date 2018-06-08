@@ -2,10 +2,8 @@ namespace NeuralNetwork
 {
     public class OutputLayer : Layer
     {
-        public OutputLayer(string name, int neuronCount, string activationFunction, Layer nextLayer = null, Layer previousLayer = null)
-        {
-            Configure(name, neuronCount, activationFunction, nextLayer, previousLayer, false);
-        }
+        public OutputLayer(string name, int neuronCount, string activationFunction, Layer nextLayer = null, Layer previousLayer = null) : 
+        base(name, neuronCount, activationFunction, nextLayer, previousLayer) { }
 
         public override double[] Output()
         {

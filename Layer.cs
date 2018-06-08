@@ -16,14 +16,17 @@ namespace NeuralNetwork
         #endregion
 
         #region Configuration
-        public void Configure(string name, int neuronCount, string activationFunction, Layer nextLayer = null, Layer previousLayer = null, bool isLayerLast = false)
+        public Layer(string name, int neuronCount, string activationFunction, Layer nextLayer = null, Layer previousLayer = null)
         {
             this.Name = name;
             this.NeuronCount = neuronCount;
             this.Neurons = new Neurons(this.NeuronCount + 1, activationFunction); // +1 for bias(es)
             this.NextLayer = nextLayer;
             this.PreviousLayer = previousLayer;
-            
+        }
+
+        public void Configure(bool isLayerLast = false)
+        {    
             // Although the last layer has a bias, it is left unused
             if(!isLayerLast)
             {

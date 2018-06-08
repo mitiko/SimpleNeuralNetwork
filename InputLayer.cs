@@ -2,11 +2,9 @@ namespace NeuralNetwork
 {
     public class InputLayer : Layer
     {
-        public InputLayer(string name, int neuronCount, string activationFunction, Layer nextLayer = null, Layer previousLayer = null)
-        {
-            Configure(name, neuronCount, activationFunction, nextLayer, previousLayer, false);
-        }
-
+        public InputLayer(string name, int neuronCount, string activationFunction, Layer nextLayer = null, Layer previousLayer = null) : 
+        base(name, neuronCount, activationFunction, nextLayer, previousLayer) { }
+        
         public override double[] Output()
         {
             return Network.Multiply(this.Neurons, this.Weights);
