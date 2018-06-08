@@ -130,38 +130,44 @@ namespace NeuralNetwork
 
         public static double DeSigmoid(double value)
         {
-            double s = Sigmoid(value);
+            double s = Math.Exp(value) / (1.0d + Math.Exp(value));
             return s * (1 - s);
         }
 
         public static double SigmoidPrime(double value)
         {
-            return Sigmoid(value) * 2 - 1;
+            double s = Math.Exp(value);
+            return s / (1.0d + s) * 2 - 1;
         }
 
         public static double DeSigmoidPrime(double value)
         {
-            return 2 * DeSigmoid(value);
+            double s = Math.Exp(value) / (1.0d + Math.Exp(value));
+            return s * (1 - s) * 2;
         }
 
         public static double HyperbolicTangent(double value)
         {
-            return 2 * Sigmoid(2 * value) - 1;
+            double s = Math.Exp(2 * value);
+            return s / (1.0d + s) * 2 - 1;
         }
 
         public static double DeHyperbolicTangent(double value)
         {
-            return 4 * DeSigmoid(2 * value);
+            double s = Math.Exp(2 * value) / (1.0d + Math.Exp(2 * value));
+            return 4 * s * (1 - s);
         }
 
         public static double Bob(double value)
         {
-            return SigmoidPrime(1.45 * value);
+            double s = Math.Exp(1.45 * value);
+            return s / (1.0d + s) * 2 - 1;
         }
 
         public static double DeBob(double value)
         {
-            return 2.9 * DeSigmoid(1.45 * value);
+            double s = Math.Exp(1.45 * value) / (1.0d + Math.Exp(1.45 * value));
+            return 2.9 * s * (1 - s);
         }
         #endregion
     }
