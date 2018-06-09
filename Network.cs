@@ -47,26 +47,18 @@ namespace NeuralNetwork
             for (i = 1; i < layers.Length - 1; i++)
             {
                 var hidden = new HiddenLayer(names[i], layers[i], activationFunctions[i]);
+                hidden.PreviousLayer = Layers[i - 1];
+                hidden.PreviousLayer.NextLayer = hidden;
                 this.Layers.Add(hidden);
             }
             var output = new OutputLayer(names[i], layers[i], activationFunctions[i]);
+            output.PreviousLayer = Layers[i - 1];
+            output.PreviousLayer.NextLayer = output;
             this.Layers.Add(output);
 
             for (i = 0; i < this.Layers.Count; i++)
             {
-                try
-                {
-                    this.Layers[i].Network = this;
-                    this.Layers[i].PreviousLayer = this.Layers[i - 1];
-                }
-                catch (System.ArgumentOutOfRangeException) { }
-
-                try
-                {
-                    this.Layers[i].NextLayer = this.Layers[i + 1];
-                }
-                catch (System.ArgumentOutOfRangeException) { }
-                
+                this.Layers[i].Network = this;
                 this.Layers[i].Configure(i == this.Layers.Count - 1);
             }
         }

@@ -58,7 +58,7 @@ namespace NeuralNetwork
         #region Interface Methods
         public virtual double[] Output()
         {
-            return new double[0];
+            return default(double[]);
         }
 
         public virtual void Forward()

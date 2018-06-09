@@ -9,12 +9,11 @@ namespace NeuralNetwork
         {
             // Skip the unused bias
             var result = new double[this.Neurons.Length - 1];
+            this.Neurons.Activate();
+
             for (int i = 0; i < result.Length; i++)
-            {
-                this.Neurons.Activate();
                 result[i] = this.Neurons.Output[i];
-                // TODO: Try directly assigning arrays -> unstable build
-            }
+                
             return result;
         }
     }
