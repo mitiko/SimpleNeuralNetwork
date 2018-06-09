@@ -15,12 +15,10 @@ namespace NeuralNetwork
             var output = Output();
 
             for (int j = 0; j < this.NextLayer.Neurons.Length - 1; j++)
-            {
-                // We have -1 because last neuron of every layer is bias
-                // Set next layer's neurons input to be this layer's output
                 this.NextLayer.Neurons.Input[j] = output[j];
-                // TODO: Try directly assigning arrays -> unstable build
-            }
+                
+            // We have -1 because last neuron of every layer is bias
+            // Set next layer's neurons input to be this layer's output
         }
     }
 }
