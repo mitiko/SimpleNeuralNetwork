@@ -27,7 +27,6 @@ namespace NeuralNetwork
             }
             else if(activationFunctions.Length == 1)
             {
-                var af = activationFunctions[0];
                 var temp = new string[layers.Length];
                 for (int k = 0; k < temp.Length; k++)
                 {
@@ -39,6 +38,16 @@ namespace NeuralNetwork
             {
                 throw new Exception("Number of layers and their activation functions don't match!" + 
                 " Try matching the numbers, or leaving only one activation function for all hidden layers");
+            }
+
+            if(names.Length == 1)
+            {
+                var temp = new string[layers.Length];
+                for (int k = 0; k < temp.Length; k++)
+                {
+                    temp[k] = $"{names[0]} : {k}";
+                }
+                names = temp;
             }
             
             var input = new InputLayer(names[0], layers[0], activationFunctions[0]);
