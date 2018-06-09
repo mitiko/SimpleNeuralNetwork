@@ -42,12 +42,19 @@ namespace NeuralNetwork
 
             if(names.Length == 1)
             {
-                var temp = new string[layers.Length];
-                for (int k = 0; k < temp.Length; k++)
+                if(!names[0].Contains("#"))
                 {
-                    temp[k] = $"{names[0]} : {k}";
+                    names = names[0].Split(';');
                 }
-                names = temp;
+                else
+                {
+                    var temp = new string[layers.Length];
+                    for (int k = 0; k < temp.Length; k++)
+                    {
+                        temp[k] = $"#layer{k + 1}";
+                    }
+                    names = temp;
+                }
             }
             
             var input = new InputLayer(names[0], layers[0], activationFunctions[0]);
