@@ -13,17 +13,13 @@ namespace NeuralNetwork
         #endregion
 
         #region Configuration
-        public Network(double learningRate, int[] layers, string[] names, string[] activationFunctions)
+        public Network(double learningRate, int[] layers, string[] activationFunctions)
         {
             this.Layers = new List<Layer>();
             this.Alpha = learningRate;
             if(layers.Length < 2)
             {
                 throw new Exception("Layers are less than 2!");
-            }
-            else if(layers.Length != names.Length)
-            {
-                throw new Exception("Arrays given do not match lengths. Check layers and names.");
             }
             else if(activationFunctions.Length == 1)
             {
@@ -40,21 +36,10 @@ namespace NeuralNetwork
                 " Try matching the numbers, or leaving only one activation function for all hidden layers");
             }
 
-            if(names.Length == 1)
+            var names = new string[layers.Length];
+            for (int k = 0; k < names.Length; k++)
             {
-                if(!names[0].Contains("#"))
-                {
-                    names = names[0].Split(';');
-                }
-                else
-                {
-                    var temp = new string[layers.Length];
-                    for (int k = 0; k < temp.Length; k++)
-                    {
-                        temp[k] = $"#layer{k + 1}";
-                    }
-                    names = temp;
-                }
+                names[k] = $"l{k + 1}";
             }
             
             var input = new InputLayer(names[0], layers[0], activationFunctions[0]);
@@ -77,6 +62,11 @@ namespace NeuralNetwork
                 this.Layers[i].Network = this;
                 this.Layers[i].Configure(i == this.Layers.Count - 1);
             }
+        }
+
+        public Network(List<Layer> Layers)
+        {
+            this.Layers = Layers;
         }
         #endregion
 
@@ -101,27 +91,25 @@ namespace NeuralNetwork
             layer.Network.Layers[GetIndexOfLayer(layer)] = layer;
         }
 
-        public static double[] Multiply(Neurons neurons, double[][] weights)
+        public static double[] Multiply(double[] neuronOutputs, double[][] weights)
         {
             // Activate neurons
             // Each neuron output * weight to each neuron in next layer
             // For loop in next layer and for loop in those neurons
             var result = new double[weights[0].Length];
-        
-            neurons.Activate();
 
             for (int j = 0; j < result.Length; j++)
             {
-                for (int i = 0; i < neurons.Length; i++)
+                for (int i = 0; i < neuronOutputs.Length; i++)
                 {
-                    result[j] += neurons.Output[i] * weights[i][j];
+                    result[j] += neuronOutputs[i] * weights[i][j];
                 }
             }
 
             return result;
         }
 
-        private void BackPropagate(Layer l, double[] expected = null)
+        private void BackPropagate(Layer l, double[] error = null)
         {
             // This is a recursive function
             // l is the current working layer
@@ -138,15 +126,15 @@ namespace NeuralNetwork
             int pn = p.Neurons.Length; // Number of neurons of previous layer (next working layer)
 
 
-            if(expected != null)
+            if(error != null)
             {
-                // Note: expected is not recursed; this parameter is not null only at last layer
+                // Note: error is not recursed; this parameter is not null only at last layer
                 // Calculate error for the last layer (first to backpropagate)
                 // We can assure this is the last layer, because its error is set to null
                 for (int i = 0; i < ln - 1; i++)
                 {
                     // We have -1 because the expected data does not cover the unused bias
-                    l.Neurons.Error[i] = expected[i] - l.Neurons.Output[i];
+                    l.Neurons.Error[i] = error[i];
                 }
             }
 
@@ -192,7 +180,6 @@ namespace NeuralNetwork
             for (int i = 0; i < Layers[0].Neurons.Length - 1; i++)
             {
                 Layers[0].Neurons.Input[i] = input[i];
-                // TODO: Try directly assigning arrays -> unstable build
             }
 
             var result = new double[this.Layers[this.Layers.Count - 1].Neurons.Length];
@@ -214,6 +201,38 @@ namespace NeuralNetwork
             return result;
         }
 
+        public (double[] result, double[] error) ForwardPropagate(double[] input, double[] expected)
+        {
+            // Give input to first layer
+            for (int i = 0; i < Layers[0].Neurons.Length - 1; i++)
+            {
+                Layers[0].Neurons.Input[i] = input[i];
+            }
+
+            var result = new double[this.Layers[this.Layers.Count - 1].Neurons.Length];
+            var error = new double[result.Length];
+
+            for (int z = 0; z < this.Layers.Count; z++)
+            {
+                var layer = this.Layers[z];
+
+                if (!IsLayerLast(layer))
+                {
+                    layer.Forward();
+                }
+                else
+                {
+                    result = layer.Output();
+                    for (int i = 0; i < result.Length; i++)
+                    {
+                        error[i] = expected[i] - result[i];
+                    }
+                }
+            }
+
+            return (result, error);
+        }
+
         public void Train(int epochs, bool randomizeData, Dictionary<double[], double[]> trainingSet, Action<int> actionAfterEachEpoch = null)
         {
             for (int i = 0; i < epochs; i++)
@@ -223,7 +242,7 @@ namespace NeuralNetwork
                     foreach (var data in trainingSet)
                     {
                         // Forward propagate, beginning with the first layer
-                        var result = ForwardPropagate(data.Key);
+                        var (result, error) = ForwardPropagate(data.Key, data.Value);
                         // Check for NaN
                         if (result.ToList().Contains(double.NaN))
                         {
@@ -231,7 +250,7 @@ namespace NeuralNetwork
                             return;
                         }
                         // Backporpagate, beginning with the last layer
-                        BackPropagate(Layers[Layers.Count - 1], data.Value);
+                        BackPropagate(Layers[Layers.Count - 1], error);
                     }
                 }
                 else
@@ -241,7 +260,7 @@ namespace NeuralNetwork
                     {
                         var r = rnd.Next(0, trainingSet.Count);
                         // Forward propagate, beginning with the first layer
-                        var result = ForwardPropagate(trainingSet.ElementAt(r).Key);
+                        var (result, error) = ForwardPropagate(trainingSet.ElementAt(r).Key, trainingSet.ElementAt(r).Value);
                         // Check for NaN
                         if (result.ToList().Contains(double.NaN))
                         {
@@ -249,7 +268,7 @@ namespace NeuralNetwork
                             return;
                         }
                         // Backporpagate, beginning with the last layer
-                        BackPropagate(Layers[Layers.Count - 1], trainingSet.ElementAt(r).Value);
+                        BackPropagate(Layers[Layers.Count - 1], error);
                     }
                 }
 
@@ -290,9 +309,8 @@ namespace NeuralNetwork
                     throw new Exception("Meta data was wrongly formatted");
                 }
             }
-            var names = text[2].Split(';');
-            var hlaf = text[3].Split(';');
-            var n = new Network(learningRate, layers, names, hlaf);
+            var hlaf = text[2].Split(';');
+            var n = new Network(learningRate, layers, hlaf);
 
             for (int p = 0; p < n.Layers.Count - 1; p++)
             {
@@ -302,7 +320,7 @@ namespace NeuralNetwork
                     // There is no weight to the bias
                     for (int j = 0; j < n.Layers[p + 1].Neurons.Length - 1; j++)
                     {
-                        string weight = text[4 + p].Split(' ')[i * (n.Layers[p + 1].Neurons.Length - 1) + j];
+                        string weight = text[3 + p].Split(' ')[i * (n.Layers[p + 1].Neurons.Length - 1) + j];
                         n.Layers[p].Weights[i][j] = double.Parse(weight);
                     }
                 }
@@ -324,14 +342,12 @@ namespace NeuralNetwork
 
             var learningRate = this.Alpha.ToString();
             var layers = Layers.Select(l => (l.Neurons.Length - 1).ToString()).ToArray();
-            var names = Layers.Select(l => l.Name).ToArray();
             var hlaf = Layers.Select(l => l.Neurons.ActivationFunction).ToArray();
             var text = new string[3 + Layers.Count];
 
             text[0] = learningRate;
             text[1] = string.Join(";", layers);
-            text[2] = string.Join(";", names);
-            text[3] = string.Join(";", hlaf);
+            text[2] = string.Join(";", hlaf);
 
             for (int p = 0; p < Layers.Count - 1; p++)
             {
@@ -342,7 +358,7 @@ namespace NeuralNetwork
                     t += string.Join(" ", Layers[p].Weights[i]);
                     t += " ";
                 }
-                text[4 + p] = t;
+                text[3 + p] = t;
             }
 
             File.WriteAllLines(filePath, text);

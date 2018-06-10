@@ -7,7 +7,8 @@ namespace NeuralNetwork
         
         public override double[] Output()
         {
-            return Network.Multiply(this.Neurons, this.Weights);
+            this.Neurons.Activate();
+            return Network.Multiply(this.Neurons.Output, this.Weights);
         }
 
         public override void Forward()
