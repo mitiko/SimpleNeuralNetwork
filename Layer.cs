@@ -53,6 +53,11 @@ namespace NeuralNetwork
             // the garbage collector doesn't create and destroy it i*j times
             return rnd.NextDouble();
         }
+
+        public virtual void Backwards(double[] error = null)
+        {
+            throw new NotImplementedException();
+        }
         #endregion
 
         #region Interface Methods
@@ -64,6 +69,7 @@ namespace NeuralNetwork
         public virtual void Forward()
         {
         }
+
         #endregion
     }
 }

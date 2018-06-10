@@ -109,7 +109,7 @@ namespace NeuralNetwork
             return result;
         }
 
-        private void BackPropagate(Layer l, double[] error = null)
+        public virtual void BackPropagate(Layer l, double[] error = null)
         {
             // This is a recursive function
             // l is the current working layer
@@ -122,6 +122,15 @@ namespace NeuralNetwork
                 // This means we can simply return
                 return;
             }
+
+            try
+            {
+                l.Backwards();
+                BackPropagate(p);
+                return;
+            }
+            catch (Exception) { }
+
             int ln = l.Neurons.Length; // Number of neurons of current layer
             int pn = p.Neurons.Length; // Number of neurons of previous layer (next working layer)
 
@@ -174,7 +183,7 @@ namespace NeuralNetwork
             BackPropagate(p);
         }
 
-        public double[] ForwardPropagate(double[] input)
+        public virtual double[] ForwardPropagate(double[] input)
         {
             // Give input to first layer
             for (int i = 0; i < Layers[0].Neurons.Length - 1; i++)
@@ -201,7 +210,7 @@ namespace NeuralNetwork
             return result;
         }
 
-        public (double[] result, double[] error) ForwardPropagate(double[] input, double[] expected)
+        public virtual (double[] result, double[] error) ForwardPropagate(double[] input, double[] expected)
         {
             // Give input to first layer
             for (int i = 0; i < Layers[0].Neurons.Length - 1; i++)
@@ -233,7 +242,7 @@ namespace NeuralNetwork
             return (result, error);
         }
 
-        public void Train(int epochs, bool randomizeData, Dictionary<double[], double[]> trainingSet, Action<int> actionAfterEachEpoch = null)
+        public virtual void Train(int epochs, bool randomizeData, Dictionary<double[], double[]> trainingSet, Action<int> actionAfterEachEpoch = null)
         {
             for (int i = 0; i < epochs; i++)
             {
