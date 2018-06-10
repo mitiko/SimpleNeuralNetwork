@@ -125,7 +125,7 @@ namespace NeuralNetwork
 
             try
             {
-                l.Backwards();
+                l.Backwards(error);
                 BackPropagate(p);
                 return;
             }
