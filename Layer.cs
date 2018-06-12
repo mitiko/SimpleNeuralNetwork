@@ -54,7 +54,7 @@ namespace NeuralNetwork
             return rnd.NextDouble();
         }
 
-        public virtual void Backwards(double[] error = null)
+        public virtual void Backward(double[] error = null)
         {
             throw new NotImplementedException();
         }
