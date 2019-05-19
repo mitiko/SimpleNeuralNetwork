@@ -13,11 +13,14 @@ namespace TreskaAi
         public Layer OutputLayer { get; private set; }
         public bool IsBuilt { get; private set; }
         public string Flow { get; private set; }
+        public DataHelper _dataHelper { get; set; }
 
-        public NeuralNetwork()
+        public NeuralNetwork(DataHelper dataHelper = null)
         {
             this.Layers = new List<Layer>();
             this.IsBuilt = false;
+            if(dataHelper == null)
+                dataHelper = new DataHelper();
         }
 
         public void AddLayer(Layer layer)
@@ -183,7 +186,7 @@ namespace TreskaAi
                     var summedLoss = this.OutputLayer.Error.Select(y => Math.Abs(y)).Sum() / this.OutputLayer.NeuronCount;
                     samplesProcessed++;
 
-                    DataHelpers.LogTrainingInformation(summedLoss, averageLoss, samplesProcessed, s, spinSpeed, sampleCount);
+                    this._dataHelper.LogTrainingInformation(summedLoss, averageLoss, samplesProcessed, s, spinSpeed, sampleCount);
                 }
             }
         }
@@ -200,7 +203,7 @@ namespace TreskaAi
                 var summedLoss = this.OutputLayer.Input.CrossEntropyLoss(output).Select(y => Math.Abs(y)).Sum() / this.OutputLayer.NeuronCount;
                 samplesProcessed++;
 
-                DataHelpers.LogTestingInformation(summedLoss, averageLoss, samplesProcessed);
+                this._dataHelper.LogTestingInformation(summedLoss, averageLoss, samplesProcessed);
             }
         }
     }

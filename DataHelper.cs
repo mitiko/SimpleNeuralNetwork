@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace TreskaAi
 {
-    public static class DataHelpers
+    public class DataHelper
     {
         public static IEnumerable<(double[], double[])> ReadCsvLines(string fileName, IEnumerable<int> inputIndexes, IEnumerable<int> outputIndexes)
         {
@@ -32,7 +32,7 @@ namespace TreskaAi
             }
         }
 
-        public static void LogTrainingInformation(double summedLoss, double averageLoss, int samplesProcessed, Stopwatch s, int spinSpeed, string sampleCount)
+        public virtual void LogTrainingInformation(double summedLoss, double averageLoss, int samplesProcessed, Stopwatch s, int spinSpeed, string sampleCount)
         {
             string loading = "";
             averageLoss = averageLoss * ((double)samplesProcessed / (samplesProcessed + 1)) + summedLoss / (samplesProcessed + 1);
@@ -49,7 +49,7 @@ namespace TreskaAi
             Console.WriteLine("--------------------------------------");
         }
 
-        public static void LogTestingInformation(double summedLoss, double averageLoss, int samplesProcessed)
+        public virtual void LogTestingInformation(double summedLoss, double averageLoss, int samplesProcessed)
         {
             averageLoss = averageLoss * ((double)samplesProcessed / (samplesProcessed + 1)) + summedLoss / (samplesProcessed + 1);
             Console.WriteLine($"Loss: {averageLoss}");
