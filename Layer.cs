@@ -17,6 +17,9 @@ namespace TreskaAi
         public double[] Error { get; internal protected set; }
         public double[][] Weights { get; internal protected set; }
 
+        public Func<double[], double[]> ActivationFunction { get; set; }
+        public Func<double[], double[]> ActivationFunctionDerivative { get; set; }
+
         public Layer(int neurons, string id)
         {
             // TODO: Add activation function
@@ -24,6 +27,19 @@ namespace TreskaAi
             this.Input = new double[neurons + 1];
             this.Error = new double[neurons];
             this.Id = id;
+            this.ActivationFunction = ActivationFunctions.Tanh;
+            this.ActivationFunctionDerivative = ActivationFunctions.DTanh;
+        }
+
+        public Layer(int neurons, string id, Func<double[], double[]> activationFunction, Func<double[], double[]> activationFunctionDerivative)
+        {
+            // TODO: Add activation function
+            this.NeuronCount = neurons;
+            this.Input = new double[neurons + 1];
+            this.Error = new double[neurons];
+            this.Id = id;
+            this.ActivationFunction = activationFunction;
+            this.ActivationFunctionDerivative = activationFunctionDerivative;
         }
 
         public virtual void Setup()
@@ -49,13 +65,12 @@ namespace TreskaAi
             // Multitply input vector with matrix
             this.Output = this.Input.Multiply(this.Weights);
             // Apply activation function
-            return this.Output.Tanh();
+            return this.ActivationFunction.Invoke(this.Output);
         }
 
         public virtual void Backward()
         {
-            // Activation Function Derivative
-            var afd = this.Output.DTanh();
+            var afd = this.ActivationFunctionDerivative.Invoke(this.Output);
 
             // Calculate error at previous layer
             this.Error = new double[this.Error.Length];
