@@ -32,26 +32,28 @@ namespace TreskaAi
             }
         }
 
-        public virtual void LogTrainingInformation(double summedLoss, double averageLoss, int samplesProcessed, Stopwatch s, int spinSpeed, string sampleCount)
+        public virtual void LogTrainingInformation(int samplesProcessed, Stopwatch s, int spinSpeed, string sampleCount)
         {
-            string loading = "";
-            averageLoss = averageLoss * ((double)samplesProcessed / (samplesProcessed + 1)) + summedLoss / (samplesProcessed + 1);
-
+            string loading = "/";
             if (samplesProcessed % spinSpeed == 0) loading = "/";
             else if (samplesProcessed % spinSpeed == (spinSpeed / 4) * 1) loading = "-";
             else if (samplesProcessed % spinSpeed == (spinSpeed / 4) * 2) loading = "\\";
             else if (samplesProcessed % spinSpeed == (spinSpeed / 4) * 3) loading = "|";
             Console.Write($"\r{loading} Time: {s.Elapsed.ToString(@"dd\.hh\:mm\:ss")} Samples: {samplesProcessed}/{sampleCount}");
+        }
 
+        public virtual void LogEpochInformation(double summedLoss, int samplesProcessed)
+        {
+            var averageLoss = summedLoss / samplesProcessed;
             Console.WriteLine();
             Console.WriteLine($"Loss: {averageLoss}");
             Console.WriteLine($"Accuracy: {1 - averageLoss}");
             Console.WriteLine("--------------------------------------");
         }
 
-        public virtual void LogTestingInformation(double summedLoss, double averageLoss, int samplesProcessed)
+        public virtual void LogTestResults(double summedLoss, int samplesProcessed)
         {
-            averageLoss = averageLoss * ((double)samplesProcessed / (samplesProcessed + 1)) + summedLoss / (samplesProcessed + 1);
+            var averageLoss = summedLoss / samplesProcessed;
             Console.WriteLine($"Loss: {averageLoss}");
             Console.WriteLine($"Accuracy: {1 - averageLoss}");
             Console.WriteLine("--------------------------------------");

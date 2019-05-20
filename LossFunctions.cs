@@ -64,16 +64,17 @@ namespace TreskaAi
 
         public static double[] CrossEntropyLoss(this double[] guess, double[] expected)
         {
+            // TODO: Find why this is wrong
             for (int i = 0; i < expected.Length; i++)
                 expected[i] = 0 - expected[i] * Math.Log(1e-15 + guess[i]);
 
             return expected;
         }
 
-        public static double[] HingeLoss(this double[] guess, double[] expected)
+        public static double[] SimpleLoss(this double[] guess, double[] expected)
         {
             for (int i = 0; i < expected.Length; i++)
-                expected[i] = Math.Max(0, 1 - guess[i] * expected[i]);
+                expected[i] = expected[i] - guess[i];
 
             return expected;
         }
