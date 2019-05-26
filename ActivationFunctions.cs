@@ -72,7 +72,7 @@ namespace TreskaAi
         public static double[] Softmax(this double[] vector)
         {
             var max = vector.Max();
-            var result = vector.Select(y => Math.Exp(y) - max);
+            var result = vector.Select(y => Math.Exp(y - max));
             var sum = result.Sum();
             return result.Select(y => y / sum).ToArray();
         }
