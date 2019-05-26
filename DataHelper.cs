@@ -8,7 +8,7 @@ namespace TreskaAi
 {
     public class DataHelper
     {
-        public static IEnumerable<(double[], double[])> ReadCsvLines(string fileName, IEnumerable<int> inputIndexes, IEnumerable<int> outputIndexes)
+        public static IEnumerable<(double[] x, double[] y)> ReadCsvLines(string fileName, IEnumerable<int> inputIndexes, IEnumerable<int> outputIndexes)
         {
             bool firstLine = true;
             string line;
@@ -19,7 +19,7 @@ namespace TreskaAi
                 {
                     if (firstLine)
                     {
-                        line = sr.ReadLine();
+                        line = sr.ReadLine(); // Skip first line
                         firstLine = false;
                     }
 
