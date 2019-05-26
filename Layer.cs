@@ -77,15 +77,19 @@ namespace TreskaAi
 
             if (afd.Length == 1)
             {
-                this.Error = this.NextLayer.Error.TransposeMultiply(this.Weights).HadamardMultiply(afd[0]);
+                this.Error = this.NextLayer.Error.HadamardMultiply(afd[0])
+                    .TransposeMultiply(this.Weights).Take(this.NeuronCount).ToArray();
                 this.Weights = (MatrixOperations) this.Weights +
-                    this.LearningRate * (MatrixOperations) this.Input.Multiply(this.NextLayer.Error.HadamardMultiply(afd[0]));
+                    this.LearningRate * (MatrixOperations)
+                    this.Input.Multiply(this.NextLayer.Error.HadamardMultiply(afd[0]));
             }
             else
             {
-                this.Error = this.NextLayer.Error.TransposeMultiply(this.Weights).Multiply(afd);
+                this.Error = this.NextLayer.Error.Multiply(afd)
+                    .TransposeMultiply(this.Weights).Take(this.NeuronCount).ToArray();
                 this.Weights = (MatrixOperations) this.Weights +
-                    this.LearningRate * (MatrixOperations) this.Input.Multiply(this.NextLayer.Error).Multiply(afd);
+                    this.LearningRate * (MatrixOperations)
+                    this.Input.Multiply(this.NextLayer.Error).Multiply(afd);
             }
         }
     }
