@@ -18,7 +18,7 @@ namespace TreskaAi
         public double[][] Weights { get; internal protected set; }
 
         public Func<double[], double[]> ActivationFunction { get; set; }
-        public Func<double[], double[]> ActivationFunctionDerivative { get; set; }
+        public Func<double[], double[][]> ActivationFunctionDerivative { get; set; }
 
         public Layer(int neurons, string id)
         {
@@ -31,7 +31,7 @@ namespace TreskaAi
             this.ActivationFunctionDerivative = ActivationFunctions.DTanh;
         }
 
-        public Layer(int neurons, string id, Func<double[], double[]> activationFunction, Func<double[], double[]> activationFunctionDerivative)
+        public Layer(int neurons, string id, Func<double[], double[]> activationFunction, Func<double[], double[][]> activationFunctionDerivative)
         {
             // TODO: Add activation function
             this.NeuronCount = neurons;
@@ -75,14 +75,18 @@ namespace TreskaAi
             // Calculate error at previous layer
             this.Error = new double[this.Error.Length];
 
-            for (int i = 0; i < this.Error.Length; i++)
-                for (int j = 0; j < this.NextLayer.NeuronCount; j++)
-                    this.Error[i] += this.Weights[i][j] * afd[j] * this.NextLayer.Error[j];
-
-            // Calculate change to weights
-            for (int i = 0; i < this.Input.Length; i++)
-                for (int j = 0; j < this.NextLayer.NeuronCount; j++)
-                    this.Weights[i][j] += this.LearningRate * this.Input[i] * afd[j] * this.NextLayer.Error[j];
+            if (afd.Length == 1)
+            {
+                this.Error = this.NextLayer.Error.TransposeMultiply(this.Weights).HadamardMultiply(afd[0]);
+                this.Weights = (MatrixOperations) this.Weights +
+                    this.LearningRate * (MatrixOperations) this.Input.Multiply(this.NextLayer.Error.HadamardMultiply(afd[0]));
+            }
+            else
+            {
+                this.Error = this.NextLayer.Error.TransposeMultiply(this.Weights).Multiply(afd);
+                this.Weights = (MatrixOperations) this.Weights +
+                    this.LearningRate * (MatrixOperations) this.Input.Multiply(this.NextLayer.Error).Multiply(afd);
+            }
         }
     }
 }
