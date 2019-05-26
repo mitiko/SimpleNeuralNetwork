@@ -20,7 +20,7 @@ namespace TreskaAi
             this.Layers = new List<Layer>();
             this.IsBuilt = false;
             if(dataHelper == null)
-                dataHelper = new DataHelper();
+                this._dataHelper = new DataHelper();
         }
 
         public void AddLayer(Layer layer)
@@ -146,7 +146,7 @@ namespace TreskaAi
                 layer = layer.NextLayer;
             }
 
-            return layer.Input;
+            return layer.Input.Take(layer.NeuronCount).ToArray();
         }
 
         public void Backpropagate(double[] expectedResult, Func<double[], double[], double[]> lossFunction)
@@ -157,7 +157,7 @@ namespace TreskaAi
                 throw new InvalidOperationException();
             }
 
-            this.OutputLayer.Error = lossFunction.Invoke(this.OutputLayer.Input, expectedResult);
+            this.OutputLayer.Error = lossFunction.Invoke(this.OutputLayer.Input.Take(this.OutputLayer.NeuronCount).ToArray(), expectedResult);
             var layer = this.OutputLayer;
             do
             {
@@ -173,21 +173,22 @@ namespace TreskaAi
             string sampleCount = "all", int spinSpeed = 40)
         {
             var s = Stopwatch.StartNew();
-            double averageLoss = 0;
             for (long i = 0; i < epochs; i++)
             {
                 int samplesProcessed = 0;
+                double summedLoss = 0;
+                Console.WriteLine($"Epoch {i + 1}/{epochs}:");
                 foreach (var (input, output) in reader)
                 {
-                    Console.WriteLine($"Epoch {i + 1}/{epochs}:");
-
                     var result = this.FeedForward(input);
                     this.Backpropagate(output, lossFunction);
-                    var summedLoss = this.OutputLayer.Error.Select(y => Math.Abs(y)).Sum() / this.OutputLayer.NeuronCount;
+                    var loss = this.OutputLayer.Error.Select(y => Math.Abs(y)).Sum() / this.OutputLayer.NeuronCount;
+                    summedLoss += loss;
                     samplesProcessed++;
 
-                    this._dataHelper.LogTrainingInformation(summedLoss, averageLoss, samplesProcessed, s, spinSpeed, sampleCount);
+                    this._dataHelper.LogTrainingInformation(samplesProcessed, s, spinSpeed, sampleCount);
                 }
+                this._dataHelper.LogEpochInformation(summedLoss, samplesProcessed);
             }
         }
 
@@ -195,16 +196,85 @@ namespace TreskaAi
         {
             Console.WriteLine("Test:");
             int samplesProcessed = 0;
-            double averageLoss = 0;
-
+            double summedLoss = 0;
             foreach (var (input, output) in reader)
             {
                 var result = this.FeedForward(input);
-                var summedLoss = this.OutputLayer.Input.CrossEntropyLoss(output).Select(y => Math.Abs(y)).Sum() / this.OutputLayer.NeuronCount;
+                summedLoss += this.OutputLayer.Input.SimpleLoss(output).Select(y => Math.Abs(y)).Sum() / this.OutputLayer.NeuronCount;
                 samplesProcessed++;
-
-                this._dataHelper.LogTestingInformation(summedLoss, averageLoss, samplesProcessed);
             }
+            this._dataHelper.LogTestResults(summedLoss, samplesProcessed);
+        }
+
+        public void Save(string fileName)
+        {
+            using (var sw = new StreamWriter(fileName))
+            {
+                sw.WriteLine("v2");
+                sw.WriteLine(this.Layers.Count);
+                foreach (var layer in this.Layers)
+                {
+                    sw.WriteLine(layer.Id);
+                    sw.WriteLine(layer.NeuronCount);
+                    // sw.WriteLine(layer.LearningRate);
+                    // sw.WriteLine(layer.ActivationFunction);
+                    if (layer.NextLayer != null)
+                    {
+                        sw.WriteLine(layer.NextLayer.NeuronCount);
+                        foreach (var w in layer.Weights)
+                        {
+                            foreach (var weight in w)
+                            {
+                                sw.WriteLine($"{weight}");
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        public void Load(string fileName)
+        {
+            using (var sr = new StreamReader(fileName))
+            {
+                if (sr.ReadLine() != "v2") throw new Exception();
+                var layers = int.Parse(sr.ReadLine());
+                for (int i = 0; i < layers; i++)
+                {
+                    var id = sr.ReadLine();
+                    var neurons = int.Parse(sr.ReadLine());
+                    this.AddLayer(new Layer(neurons, id));
+                    if (i < layers - 1)
+                    {
+                        var nextLayerNeurons = int.Parse(sr.ReadLine());
+                        this.Layers.Last().Weights = new double[neurons + 1][];
+
+                        for (int a = 0; a < neurons + 1; a++)
+                        {
+                            this.Layers.Last().Weights[a] = new double[nextLayerNeurons];
+                            for (int b = 0; b < nextLayerNeurons; b++)
+                            {
+                                this.Layers.Last().Weights[a][b] = double.Parse(sr.ReadLine());
+                            }
+                        }
+                    }
+                }
+            }
+            var s = "";
+            for (int m = 0; m < this.Layers.Count - 1; m++)
+            {
+                s += this.Layers[m].Id + ";";
+            }
+            s+=this.Layers.Last().Id;
+            this.SetInput(this.Layers.First().Id);
+            this.SetOutput(this.Layers.Last().Id);
+            for (int i = 0; i < this.Layers.Count - 1; i++)
+                this.Layers[i].NextLayer = this.Layers[i+1];
+
+            for (int i = 1; i < this.Layers.Count; i++)
+                this.Layers[i].PreviousLayer = this.Layers[i-1];
+
+            this.IsBuilt = true;
         }
     }
 }
