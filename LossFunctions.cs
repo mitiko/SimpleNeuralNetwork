@@ -65,8 +65,9 @@ namespace TreskaAi
         public static double[] CrossEntropyLoss(this double[] guess, double[] expected)
         {
             // TODO: Find why this is wrong
+                // expected[i] = - expected[i] * Math.Log(1e-15 + guess[i]);
             for (int i = 0; i < expected.Length; i++)
-                expected[i] = 0 - expected[i] * Math.Log(1e-15 + guess[i]);
+                expected[i] = - Math.Log(expected[i] == 1 ? guess[i] : 1 - guess[i]);
 
             return expected;
         }
